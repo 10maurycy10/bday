@@ -19,12 +19,13 @@ def print_table(headers, data):
             width[i] = max(width[i], len(point))
 
     # Row seperator
-    seperator = '|' + "|".join(["-"*(colwidth+2) for colwidth in width]) + '|'
+    seperator = '+' + "+".join(["-"*(colwidth+2) for colwidth in width]) + "+"
    
     # Format and print header
     line = []
     for (colidx, col) in enumerate(headers):
         line.append(col.ljust(width[colidx]))
+    print(seperator)
     print("| " + " | ".join(line) + " |");
     
     # Format and print data
@@ -72,12 +73,22 @@ def ls(db):
     formated = []
     for (name, uuid, y, m, d) in dbc:
         today = datetime.date.today()
+        bday = datetime.date(today.year,m,d)
+        # Compute year of next bday
+        year_of_next_bday = 0
+        if bday >= today:
+            year_of_next_bday = today.year
+        else:
+            year_of_next_bday = today.year + 1
+        
+
         age = today.year - y
         if today.day != d and today.month != m:
             age = age + 1
-        daysto = (today - datetime.date(today.year,m,d)).days
-        formated.append([uuid, name, str(y), str(m), str(d), str(daysto), str(age)])
-    print_table(["ID", "Name", "Year", "Month", "Day", "Days to birthday", "Age next bday"], formated);
+        daysto = (datetime.date(year_of_next_bday,m,d) - today).days
+        date = datetime.date(y,m,d).isoformat()
+        formated.append([uuid, name, date, str(daysto), str(age)])
+    print_table(["ID", "Name", "Date", "Days to birthday", "Age next bday"], formated);
 
 
 def help(name):
