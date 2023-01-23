@@ -80,10 +80,9 @@ def ls(db):
             year_of_next_bday = today.year
         else:
             year_of_next_bday = today.year + 1
-        
 
         age = today.year - y
-        if today.day != d and today.month != m:
+        if today.day != d or today.month != m:
             age = age + 1
         daysto = (datetime.date(year_of_next_bday,m,d) - today).days
         date = datetime.date(y,m,d).isoformat()
