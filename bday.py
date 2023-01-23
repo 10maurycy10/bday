@@ -89,6 +89,28 @@ def ls(db):
         formated.append([uuid, name, date, str(daysto), str(age)])
     print_table(["ID", "Name", "Date", "Days to birthday", "Age next bday"], formated);
 
+def soon(db):
+    dbc = db.cursor()
+    dbc.execute("select names.name,names.uuid,bday.year,bday.month,bday.day from names join bday on bday.uuid = names.uuid");
+    formated = []
+    for (name, uuid, y, m, d) in dbc:
+        today = datetime.date.today()
+        bday = datetime.date(today.year,m,d)
+        # Compute year of next bday
+        year_of_next_bday = 0
+        if bday >= today:
+            year_of_next_bday = today.year
+        else:
+            year_of_next_bday = today.year + 1
+
+        age = today.year - y
+        if today.day != d or today.month != m:
+            age = age + 1
+        daysto = (datetime.date(year_of_next_bday,m,d) - today).days
+        date = datetime.date(y,m,d).isoformat()
+
+        if daysto < 5:
+            print(f"{name} has a birthday on {date} in {daysto} days, turning {age}")
 
 def help(name):
     print(f"Usage: {name} [subcommands]")
@@ -96,6 +118,7 @@ def help(name):
     print("\tadd [name] [bday] : Add a person to the database, date should be in iso format")
     print("\tdel [uuid] : remove from database, by id")
     print("\tls : List out all pepole in database")
+    print("\tsoon: Shows birthdays closer that 5 days in the future")
     print('\thelp : Show usage information')
     
 
@@ -123,6 +146,9 @@ while len(args) > 0:
         case "ls":
             args = args[1:]
             ls(db)
+        case "soon":
+            args = args[1:]
+            soon(db)
         case a:
             args = args[1:]
             print(f"unknown subcommand {a}");
